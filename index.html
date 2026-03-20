@@ -1,0 +1,111 @@
+<!DOCTYPE html>
+<html>
+<head>
+  <!--
+    If you are serving your web app in a path other than the root, change the
+    href value below to reflect the base path you are serving from.
+
+    The path provided below has to start and end with a slash "/" in order for
+    it to work correctly.
+
+    For more details:
+    * https://developer.mozilla.org/en-US/docs/Web/HTML/Element/base
+
+    This is a placeholder for base href that will be replaced by the value of
+    the `--base-href` argument provided to `flutter build`.
+  -->
+
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+  <!-- SEO -->
+  <meta name="description"
+    content="Your Name — Flutter Developer. Portfolio showcasing mobile and web projects.">
+  <meta name="keywords"
+    content="Flutter, Dart, Mobile Developer, Web Developer, Portfolio">
+  <meta name="author" content="Your Name">
+
+  <!-- Open Graph (for link previews on social media) -->
+  <meta property="og:title" content="Your Name — Flutter Developer">
+  <meta property="og:description"
+    content="Flutter Developer specialising in mobile and web apps.">
+  <meta property="og:type" content="website">
+  <meta property="og:url" content="https://yourusername.github.io/portfolio">
+
+  <!-- Twitter card -->
+  <meta name="twitter:card" content="summary">
+  <meta name="twitter:title" content="Kaung Kin Kyal — Software Developer">
+  <meta name="twitter:description"
+    content="Software Developer specialising in mobile and web apps.">
+
+  <title>Kaung Kin Kyal | Software Developer</title>
+
+  <base href="/portfolio/">
+
+  <meta charset="UTF-8">
+  <meta content="IE=Edge" http-equiv="X-UA-Compatible">
+  <meta name="description" content="A new Flutter project.">
+
+  <!-- iOS meta tags & icons -->
+  <meta name="mobile-web-app-capable" content="yes">
+  <meta name="apple-mobile-web-app-status-bar-style" content="black">
+  <meta name="apple-mobile-web-app-title" content="porfolio">
+  <link rel="apple-touch-icon" href="icons/Icon-192.png">
+
+  <!-- Favicon -->
+  <link rel="icon" type="image/png" href="favicon.png"/>
+
+  <title>porfolio</title>
+  <link rel="manifest" href="manifest.json">
+</head>
+<body>
+  <!--
+    You can customize the "flutter_bootstrap.js" script.
+    This is useful to provide a custom configuration to the Flutter loader
+    or to give the user feedback during the initialization process.
+
+    For more details:
+    * https://docs.flutter.dev/platform-integration/web/initialization
+  -->
+    <!-- Loading screen shown before Flutter initializes -->
+  <div id="loading"
+    style="
+      position: fixed; inset: 0;
+      display: flex; flex-direction: column;
+      align-items: center; justify-content: center;
+      background: #0F0F1A;
+      font-family: sans-serif;
+      z-index: 9999;
+    ">
+    <div style="
+      width: 48px; height: 48px;
+      border: 3px solid rgba(108,99,255,0.2);
+      border-top-color: #6C63FF;
+      border-radius: 50%;
+      animation: spin 0.8s linear infinite;
+    "></div>
+    <p style="color: #6C63FF; margin-top: 20px;
+      font-size: 14px; letter-spacing: 2px;">
+      LOADING
+    </p>
+  </div>
+
+  <style>
+    @keyframes spin {
+      to { transform: rotate(360deg); }
+    }
+  </style>
+
+  <script>
+    // Hide loader once Flutter is ready
+    window.addEventListener('flutter-first-frame', function() {
+      const loader = document.getElementById('loading');
+      loader.style.opacity = '0';
+      loader.style.transition = 'opacity 0.5s ease';
+      setTimeout(() => loader.remove(), 500);
+    });
+  </script>
+
+  <script src="flutter_bootstrap.js" async></script>
+</body>
+</html>
