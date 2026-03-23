@@ -38,9 +38,12 @@ class PortfolioData {
       'title':       'Telegram e-commerce mini Web-App',
       'description': 'Full-featured e-commerce application supporting cart management, secure payments, and real-time order tracking. The platform is designed with a multi-role architecture including customers, riders, and administrators, with orders dynamically assigned to riders based on shop and delivery flow. The system integrates with a Telegram bot to streamline communication between all roles. Instead of direct interaction, customers, riders, and admins communicate through the bot, which automatically routes messages and updates based on user roles and IDs—ensuring efficient coordination, order handling, and status updates.',
       'tags':        ['nodeJS', 'Firebase', 'Render'],
-      'github':      'https://github.com/yourhandle/project1',
-      'live':        'https://project1.com',
-      'icon': Icons.shopping_cart_rounded,
+      // 'github':      'https://github.com/yourhandle/project1',
+      // 'live':        'https://project1.com',
+      'icon': 'assets/send_food.png',
+      'images': [
+      'assets/screenshots/send_food_mobile_home_start.png',
+      'assets/screenshots/send_food_mobile_shop_view.png',    ],
     },
     {
       'title':       'Weather App',
