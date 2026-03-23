@@ -162,128 +162,241 @@ class _ProjectCard extends StatefulWidget {
 }
 
 class _ProjectCardState extends State<_ProjectCard> {
+  late final icon = widget.project['icon'] as IconData? ?? Icons.folder_rounded;
   bool _hovered = false;
 
   @override
   Widget build(BuildContext context) {
-    final title       = widget.project['title']       as String;
-    final description = widget.project['description'] as String;
+    final title       = widget.project['title'] as String;
     final tags        = (widget.project['tags'] as List).cast<String>();
-    final github      = widget.project['github']      as String;
-    final live        = widget.project['live']        as String;
+    final github      = widget.project['github'] as String?;
+    final live        = widget.project['live'] as String?;
 
     return MouseRegion(
       onEnter: (_) => setState(() => _hovered = true),
-      onExit:  (_) => setState(() => _hovered = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 200),
-        transform: Matrix4.translationValues(0, _hovered ? -6 : 0, 0),
-        decoration: BoxDecoration(
-          color: Theme.of(context).colorScheme.surface,
-          borderRadius: BorderRadius.circular(16),
-          border: Border.all(
-            color: _hovered
-                ? AppTheme.primaryColor.withOpacity(0.4)
-                : Theme.of(context).dividerColor.withOpacity(0.1),
-          ),
-          boxShadow: [
-            BoxShadow(
+      onExit: (_) => setState(() => _hovered = false),
+      child: GestureDetector(
+        onTap: _openDetailDialog,
+        child: AnimatedContainer(
+          duration: const Duration(milliseconds: 200),
+          transform: Matrix4.translationValues(0, _hovered ? -6 : 0, 0),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+            border: Border.all(
               color: _hovered
-                  ? AppTheme.primaryColor.withOpacity(0.12)
-                  : Colors.black.withOpacity(0.05),
-              blurRadius: _hovered ? 24 : 10,
-              offset: const Offset(0, 8),
+                  ? AppTheme.primaryColor.withOpacity(0.4)
+                  : Theme.of(context).dividerColor.withOpacity(0.1),
             ),
-          ],
-        ),
-        child: Padding(
-          padding: const EdgeInsets.all(24),
+            boxShadow: [
+              BoxShadow(
+                color: _hovered
+                    ? AppTheme.primaryColor.withOpacity(0.12)
+                    : Colors.black.withOpacity(0.05),
+                blurRadius: _hovered ? 24 : 10,
+                offset: const Offset(0, 8),
+              ),
+            ],
+          ),
+          padding: const EdgeInsets.all(16),
           child: Column(
             crossAxisAlignment: CrossAxisAlignment.start,
+            mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Top row: folder icon + links ──────────
+              // Top row: folder icon + GitHub/Live links
               Row(
                 mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
                   Container(
-                    width: 44,
-                    height: 44,
+                    width: 36,
+                    height: 36,
                     decoration: BoxDecoration(
                       color: AppTheme.primaryColor.withOpacity(0.1),
-                      borderRadius: BorderRadius.circular(10),
+                      borderRadius: BorderRadius.circular(8),
                     ),
                     child: Icon(
-                      Icons.folder_rounded,
+                      icon,
                       color: AppTheme.primaryColor,
-                      size: 24,
+                      size: 20,
                     ),
                   ),
                   Row(
                     children: [
-                      if (github.isNotEmpty)
+                      if (github != null && github.isNotEmpty)
                         _IconLink(
                           icon: Icons.code_rounded,
                           url: github,
                           tooltip: 'GitHub',
                         ),
-                      if (live.isNotEmpty) ...[
-                        const SizedBox(width: 8),
-                        _IconLink(
-                          icon: Icons.open_in_new_rounded,
-                          url: live,
-                          tooltip: 'Live demo',
+                      if (live != null && live.isNotEmpty)
+                        Padding(
+                          padding: const EdgeInsets.only(left: 6),
+                          child: _IconLink(
+                            icon: Icons.open_in_new_rounded,
+                            url: live,
+                            tooltip: 'Live demo',
+                          ),
                         ),
-                      ],
                     ],
                   ),
                 ],
               ),
 
-              const SizedBox(height: 20),
+              const SizedBox(height: 12),
 
-              // ── Title ─────────────────────────────────
+              // Title
               Text(
                 title,
-                style: Theme.of(context).textTheme.headlineMedium?.copyWith(
-                  fontSize: 20,
-                ),
+                style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                      fontSize: 16,
+                      fontWeight: FontWeight.w600,
+                    ),
+                maxLines: 2,
+                overflow: TextOverflow.ellipsis,
               ),
 
-              const SizedBox(height: 10),
+              const SizedBox(height: 8),
 
-              // ── Description ───────────────────────────
+              // Tags
+              if (tags.isNotEmpty)
+                Wrap(
+                  spacing: 6,
+                  runSpacing: 4,
+                  children: tags.map((tag) => Container(
+                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 3),
+                    decoration: BoxDecoration(
+                      color: AppTheme.primaryColor.withOpacity(0.08),
+                      borderRadius: BorderRadius.circular(6),
+                    ),
+                    child: Text(
+                      tag,
+                      style: const TextStyle(
+                        fontSize: 11,
+                        color: AppTheme.primaryColor,
+                        fontWeight: FontWeight.w500,
+                      ),
+                    ),
+                  )).toList(),
+                ),
+            ],
+          ),
+        ),
+      ),
+    );
+  }
+
+  void _openDetailDialog() {
+    final title       = widget.project['title'] as String;
+    final description = widget.project['description'] as String;
+    final tags        = (widget.project['tags'] as List).cast<String>();
+    final github      = widget.project['github'] as String?;
+    final live        = widget.project['live'] as String?;
+    final images      = (widget.project['images'] as List<String>?) ?? [];
+
+    showDialog(
+      context: context,
+      builder: (context) => Dialog(
+        backgroundColor: Colors.transparent,
+        child: Container(
+          width: 700,
+          constraints: const BoxConstraints(maxHeight: 600),
+          padding: const EdgeInsets.all(24),
+          decoration: BoxDecoration(
+            color: Theme.of(context).colorScheme.surface,
+            borderRadius: BorderRadius.circular(16),
+          ),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              // Title + close button
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                children: [
+                  Expanded(
+                    child: Text(
+                      title,
+                      style: Theme.of(context)
+                          .textTheme
+                          .headlineMedium
+                          ?.copyWith(fontSize: 22),
+                    ),
+                  ),
+                  IconButton(
+                    icon: const Icon(Icons.close),
+                    onPressed: () => Navigator.pop(context),
+                  ),
+                ],
+              ),
+              const SizedBox(height: 16),
+
+              // Scrollable description + tags + images
               Expanded(
-                child: Text(
-                  description,
-                  style: Theme.of(context).textTheme.bodyMedium,
-                  maxLines: 3,
-                  overflow: TextOverflow.ellipsis,
+                child: SingleChildScrollView(
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    children: [
+                      Text(description, style: Theme.of(context).textTheme.bodyMedium),
+                      const SizedBox(height: 16),
+                      if (tags.isNotEmpty)
+                        Wrap(
+                          spacing: 8,
+                          runSpacing: 6,
+                          children: tags.map((tag) => Container(
+                            padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
+                            decoration: BoxDecoration(
+                              color: AppTheme.primaryColor.withOpacity(0.08),
+                              borderRadius: BorderRadius.circular(6),
+                            ),
+                            child: Text(
+                              tag,
+                              style: const TextStyle(
+                                fontSize: 12,
+                                color: AppTheme.primaryColor,
+                                fontWeight: FontWeight.w500,
+                              ),
+                            ),
+                          )).toList(),
+                        ),
+                      const SizedBox(height: 16),
+                      if (images.isNotEmpty)
+                        Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: images.map((img) => Padding(
+                            padding: const EdgeInsets.only(bottom: 12),
+                            child: Image.network(img, fit: BoxFit.cover),
+                          )).toList(),
+                        ),
+                    ],
+                  ),
                 ),
               ),
 
               const SizedBox(height: 16),
 
-              // ── Tag chips ─────────────────────────────
-              Wrap(
-                spacing: 8,
-                runSpacing: 6,
-                children: tags.map((tag) => Container(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 10, vertical: 4,
-                  ),
-                  decoration: BoxDecoration(
-                    color: AppTheme.primaryColor.withOpacity(0.08),
-                    borderRadius: BorderRadius.circular(6),
-                  ),
-                  child: Text(
-                    tag,
-                    style: TextStyle(
-                      fontSize: 12,
-                      color: AppTheme.primaryColor,
-                      fontWeight: FontWeight.w500,
+              // Buttons
+              Row(
+                children: [
+                  if (github != null && github.isNotEmpty)
+                    ElevatedButton.icon(
+                      onPressed: () async {
+                        final uri = Uri.parse(github);
+                        if (await canLaunchUrl(uri)) launchUrl(uri);
+                      },
+                      icon: const Icon(Icons.code),
+                      label: const Text("GitHub"),
                     ),
-                  ),
-                )).toList(),
+                  if (live != null && live.isNotEmpty) ...[
+                    const SizedBox(width: 12),
+                    OutlinedButton.icon(
+                      onPressed: () async {
+                        final uri = Uri.parse(live);
+                        if (await canLaunchUrl(uri)) launchUrl(uri);
+                      },
+                      icon: const Icon(Icons.open_in_new),
+                      label: const Text("Live"),
+                    ),
+                  ]
+                ],
               ),
             ],
           ),

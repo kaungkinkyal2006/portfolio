@@ -61,7 +61,7 @@ class _SectionHeading extends StatelessWidget {
           'Skills',
           style: Theme.of(context).textTheme.displayMedium,
         ),
-        const SizedBox(height: 8),
+        const SizedBox(height: 10),
         Container(
           width: 50,
           height: 4,
@@ -140,124 +140,48 @@ class _SkillsGrid extends StatelessWidget {
     );
 
     return Obx(() {
-      final filtered = ctrl.filteredSkills;
+  final filtered = ctrl.filteredSkills;
 
-      return GridView.builder(
-        shrinkWrap: true,
-        physics: const NeverScrollableScrollPhysics(),
-        gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
-          crossAxisCount: crossCount,
-          crossAxisSpacing: 24,
-          mainAxisSpacing: 24,
-          childAspectRatio: isDesktop ? 3.5 : 3.0,
-        ),
-        itemCount: filtered.length,
-        itemBuilder: (context, index) {
-          // Find original index to get the right animation
-          final skill = filtered[index];
-          final originalIndex = PortfolioData.skills.indexOf(skill);
-
-          return _SkillCard(
-            skill: skill,
-            animation: ctrl.barAnimations[originalIndex],
-          );
-        },
-      );
-    });
-  }
+  return Wrap(
+    spacing: 12,
+    runSpacing: 12,
+    children: filtered.map((skill) {
+      return _SkillCard(skill: skill);
+    }).toList(),
+  );
+});
+ }
 }
 
 // ── Single skill card ──────────────────────────────────────
 class _SkillCard extends StatelessWidget {
   final Map<String, dynamic> skill;
-  final Animation<double> animation;
 
-  const _SkillCard({required this.skill, required this.animation});
+  const _SkillCard({required this.skill});
 
   @override
   Widget build(BuildContext context) {
-    final name  = skill['name']  as String;
-    final level = skill['level'] as double;
-    final percent = (level * 100).toInt();
+    final name = skill['name'] as String;
 
     return Container(
-      padding: const EdgeInsets.all(20),
-      decoration: BoxDecoration(
-        color: Theme.of(context).colorScheme.surface,
-        borderRadius: BorderRadius.circular(12),
-        border: Border.all(
-          color: Theme.of(context).dividerColor.withOpacity(0.1),
-        ),
-        boxShadow: [
-          BoxShadow(
-            color: Colors.black.withOpacity(0.04),
-            blurRadius: 10,
-            offset: const Offset(0, 4),
-          ),
-        ],
+      padding: const EdgeInsets.symmetric(
+        horizontal: 16,
+        vertical: 10,
       ),
-      child: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        mainAxisAlignment: MainAxisAlignment.center,
-        children: [
-          // Name + percentage row
-          Row(
-            mainAxisAlignment: MainAxisAlignment.spaceBetween,
-            children: [
-              Text(
-                name,
-                style: Theme.of(context).textTheme.labelLarge,
-              ),
-              AnimatedBuilder(
-                animation: animation,
-                builder: (_, __) => Text(
-                  '${(animation.value * 100).toInt()}%',
-                  style: TextStyle(
-                    fontSize: 13,
-                    fontWeight: FontWeight.w600,
-                    color: AppTheme.primaryColor,
-                  ),
-                ),
-              ),
-            ],
-          ),
-          const SizedBox(height: 12),
-
-          // Progress bar
-          ClipRRect(
-            borderRadius: BorderRadius.circular(4),
-            child: Stack(
-              children: [
-                // Background track
-                Container(
-                  height: 8,
-                  width: double.infinity,
-                  color: AppTheme.primaryColor.withOpacity(0.1),
-                ),
-                // Animated fill
-                AnimatedBuilder(
-                  animation: animation,
-                  builder: (context, _) {
-                    return FractionallySizedBox(
-                      widthFactor: animation.value,
-                      child: Container(
-                        height: 8,
-                        decoration: BoxDecoration(
-                          gradient: LinearGradient(
-                            colors: [
-                              AppTheme.primaryColor,
-                              AppTheme.secondaryColor,
-                            ],
-                          ),
-                        ),
-                      ),
-                    );
-                  },
-                ),
-              ],
-            ),
-          ),
-        ],
+      decoration: BoxDecoration(
+        color: AppTheme.primaryColor.withOpacity(0.08),
+        borderRadius: BorderRadius.circular(30),
+        border: Border.all(
+          color: AppTheme.primaryColor.withOpacity(0.2),
+        ),
+      ),
+      child: Text(
+        name,
+        style: TextStyle(
+          fontSize: 14,
+          fontWeight: FontWeight.w500,
+          color: AppTheme.primaryColor,
+        ),
       ),
     );
   }

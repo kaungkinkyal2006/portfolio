@@ -89,27 +89,6 @@ class _TextContent extends StatelessWidget {
           : CrossAxisAlignment.center,
       mainAxisSize: MainAxisSize.min,
       children: [
-        // Greeting chip
-        Container(
-          padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 6),
-          decoration: BoxDecoration(
-            color: AppTheme.primaryColor.withOpacity(0.1),
-            borderRadius: BorderRadius.circular(20),
-            border: Border.all(
-              color: AppTheme.primaryColor.withOpacity(0.3),
-            ),
-          ),
-          child: Text(
-            '👋  Hello, world!',
-            style: TextStyle(
-              fontSize: 13,
-              color: AppTheme.primaryColor,
-              fontWeight: FontWeight.w500,
-            ),
-          ),
-        ),
-
-        const SizedBox(height: 20),
 
         // Name
         Text(
@@ -168,7 +147,7 @@ class _TextContent extends StatelessWidget {
           alignment: isDesktop ? WrapAlignment.start : WrapAlignment.center,
           children: [
             ElevatedButton.icon(
-              onPressed: () => _launch(PortfolioData.resumeUrl),
+              onPressed: () => _download(PortfolioData.resumeUrl),
               icon: const Icon(Icons.download_rounded, size: 18),
               label: const Text('Download CV'),
             ),
@@ -217,6 +196,17 @@ class _TextContent extends StatelessWidget {
       ],
     );
   }
+
+  Future<void> _download(String url) async {
+  final uri = Uri.parse(url);
+
+  if (!await launchUrl(
+    uri,
+    mode: LaunchMode.externalApplication,
+  )) {
+    throw 'Could not launch $url';
+  }
+}
 
   void _launch(String url) async {
     final uri = Uri.parse(url);

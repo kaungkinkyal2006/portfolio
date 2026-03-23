@@ -55,6 +55,7 @@ class SkillsController extends GetxController
       ).animate(CurvedAnimation(
         parent: barControllers[i],
         curve: Curves.easeOutCubic,
+    
       )),
     );
   }

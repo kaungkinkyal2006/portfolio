@@ -22,20 +22,6 @@ class HomeView extends StatelessWidget {
           // ── Sticky navbar ────────────────────────────
           AppNavbar(),
 
-          // ── Mobile drawer slides in below navbar ─────
-          // ── Mobile drawer slides in below navbar ─────
-Obx(() {
-  final nav = Get.find<NavigationController>();
-  if (!Responsive.isMobile(context)) return const SizedBox.shrink();
-  return AnimatedSize(
-    duration: const Duration(milliseconds: 300),
-    curve: Curves.easeInOut,
-    child: nav.isMenuOpen.value
-        ? const MobileDrawer()
-        : const SizedBox.shrink(),
-  );
-}),
-
           // ── Scrollable content ───────────────────────
           Expanded(
             child: SingleChildScrollView(
