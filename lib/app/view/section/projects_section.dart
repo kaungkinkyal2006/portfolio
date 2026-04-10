@@ -21,19 +21,19 @@ class ProjectsSection extends StatelessWidget {
         padding: EdgeInsets.symmetric(
           horizontal: Responsive.value<double>(
             context,
-            mobile: 24,
+            mobile: 16,
             tablet: 60,
             desktop: 120,
           ),
-          vertical: 80,
+          vertical: 60,
         ),
         child: Column(
           crossAxisAlignment: CrossAxisAlignment.start,
           children: [
             _SectionHeading(),
-            const SizedBox(height: 40),
+            const SizedBox(height: 32),
             _TagFilter(ctrl: ctrl),
-            const SizedBox(height: 48),
+            const SizedBox(height: 32),
             _ProjectsGrid(ctrl: ctrl),
           ],
         ),
@@ -80,8 +80,8 @@ class _TagFilter extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Obx(() => Wrap(
-          spacing: 10,
-          runSpacing: 10,
+          spacing: 8,
+          runSpacing: 8,
           children: ctrl.tags.map((tag) {
             final isSelected = ctrl.selectedTag.value == tag;
             return GestureDetector(
@@ -89,8 +89,8 @@ class _TagFilter extends StatelessWidget {
               child: AnimatedContainer(
                 duration: const Duration(milliseconds: 200),
                 padding: const EdgeInsets.symmetric(
-                  horizontal: 20,
-                  vertical: 10,
+                  horizontal: 14,
+                  vertical: 8,
                 ),
                 decoration: BoxDecoration(
                   color: isSelected
@@ -106,7 +106,7 @@ class _TagFilter extends StatelessWidget {
                 child: Text(
                   tag,
                   style: TextStyle(
-                    fontSize: 14,
+                    fontSize: 12,
                     fontWeight: FontWeight.w500,
                     color: isSelected ? Colors.white : AppTheme.primaryColor,
                   ),
@@ -125,6 +125,7 @@ class _ProjectsGrid extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
     final crossCount = Responsive.value<int>(
       context,
       mobile: 1,
@@ -135,6 +136,17 @@ class _ProjectsGrid extends StatelessWidget {
     return Obx(() {
       final filtered = ctrl.filteredProjects;
 
+      // On mobile use ListView instead of GridView — no aspect ratio issues
+      if (isMobile) {
+        return ListView.separated(
+          shrinkWrap: true,
+          physics: const NeverScrollableScrollPhysics(),
+          itemCount: filtered.length,
+          separatorBuilder: (_, __) => const SizedBox(height: 16),
+          itemBuilder: (_, index) => _ProjectCard(project: filtered[index]),
+        );
+      }
+
       return GridView.builder(
         shrinkWrap: true,
         physics: const NeverScrollableScrollPhysics(),
@@ -144,7 +156,7 @@ class _ProjectsGrid extends StatelessWidget {
           mainAxisSpacing: 16,
           childAspectRatio: Responsive.value<double>(
             context,
-            mobile: 2.4,
+            mobile: 1.0,
             tablet: 0.88,
             desktop: 0.92,
           ),
@@ -175,6 +187,7 @@ class _ProjectCardState extends State<_ProjectCard> {
     final tags = (widget.project['tags'] as List).cast<String>();
     final github = widget.project['github'] as String?;
     final live = widget.project['live'] as String?;
+    final isMobile = Responsive.isMobile(context);
 
     return MouseRegion(
       cursor: SystemMouseCursors.click,
@@ -184,7 +197,7 @@ class _ProjectCardState extends State<_ProjectCard> {
         onTap: () => _openDetailDialog(iconPath: iconPath),
         child: AnimatedContainer(
           duration: const Duration(milliseconds: 200),
-          transform: Matrix4.translationValues(0, _hovered ? -6 : 0, 0),
+          transform: Matrix4.translationValues(0, _hovered ? -4 : 0, 0),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
             borderRadius: BorderRadius.circular(16),
@@ -203,160 +216,253 @@ class _ProjectCardState extends State<_ProjectCard> {
               ),
             ],
           ),
-          child: Column(
-            crossAxisAlignment: CrossAxisAlignment.stretch,
-            children: [
-              // ── Icon zone ────────────────────────────────
-              Expanded(
-                flex: 3,
-                child: ClipRRect(
-                  borderRadius: const BorderRadius.only(
-                    topLeft: Radius.circular(15),
-                    topRight: Radius.circular(15),
-                  ),
-                  child: Stack(
-                    fit: StackFit.expand,
-                    children: [
-                      Container(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.06),
-                      ),
-                      Center(
-                        child: iconPath != null
-                            ? Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color:Colors.white,
-                                  borderRadius: BorderRadius.circular(22),
-                                  boxShadow: [
-                                    BoxShadow(
-                                      color:
-                                          Colors.black.withValues(alpha: 0.12),
-                                      blurRadius: 16,
-                                      offset: const Offset(0, 4),
-                                    ),
-                                  ],
-                                ),
-                                child: ClipRRect(
-                                  borderRadius: BorderRadius.circular(22),
-                                  child: Padding(
-                                    padding: const EdgeInsets.all(8.0),
-                                    child: Image.asset(
-                                      iconPath,
-                                      width: 90,
-                                      height: 90,
-                                      fit: BoxFit.contain,
-                                    ),
-                                  ),
-                                ),
-                              )
-                            : Container(
-                                width: 90,
-                                height: 90,
-                                decoration: BoxDecoration(
-                                  color: AppTheme.primaryColor
-                                      .withValues(alpha: 0.12),
-                                  borderRadius: BorderRadius.circular(22),
-                                ),
-                                child: Icon(
-                                  Icons.folder_rounded,
-                                  size: 48,
-                                  color: AppTheme.primaryColor
-                                      .withValues(alpha: 0.45),
-                                ),
-                              ),
-                      ),
-                      // Link buttons
-                      Positioned(
-                        top: 10,
-                        right: 10,
-                        child: Row(
-                          children: [
-                            if (github != null && github.isNotEmpty)
-                              _IconLink(
-                                icon: Icons.code_rounded,
-                                url: github,
-                                tooltip: 'GitHub',
-                              ),
-                            if (live != null && live.isNotEmpty) ...[
-                              const SizedBox(width: 6),
-                              _IconLink(
-                                icon: Icons.open_in_new_rounded,
-                                url: live,
-                                tooltip: 'Live demo',
-                              ),
-                            ],
-                          ],
-                        ),
-                      ),
-                    ],
-                  ),
-                ),
-              ),
+          // ── Mobile: row layout, Desktop: column layout ──
+          child: isMobile
+              ? _buildMobileCard(context, iconPath, title, tags, github, live)
+              : _buildDesktopCard(context, iconPath, title, tags, github, live),
+        ),
+      ),
+    );
+  }
 
-              Container(
-                height: 0.5,
-                color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
-              ),
-
-              // ── Info zone ────────────────────────────────
-              Expanded(
-                flex: 2,
-                child: Padding(
-                  padding: const EdgeInsets.symmetric(
-                    horizontal: 14,
-                    vertical: 10,
-                  ),
-                  child: Column(
-                    crossAxisAlignment: CrossAxisAlignment.start,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
+  // Mobile: horizontal layout — icon on left, info on right
+  Widget _buildMobileCard(BuildContext context, String? iconPath, String title,
+      List<String> tags, String? github, String? live) {
+    return Padding(
+      padding: const EdgeInsets.all(14),
+      child: Row(
+        children: [
+          // Icon
+          Container(
+            width: 64,
+            height: 64,
+            decoration: BoxDecoration(
+              color: iconPath != null
+                  ? Colors.white
+                  : AppTheme.primaryColor.withValues(alpha: 0.12),
+              borderRadius: BorderRadius.circular(16),
+              boxShadow: iconPath != null
+                  ? [
+                      BoxShadow(
+                        color: Colors.black.withValues(alpha: 0.10),
+                        blurRadius: 8,
+                        offset: const Offset(0, 2),
+                      )
+                    ]
+                  : [],
+            ),
+            child: iconPath != null
+                ? ClipRRect(
+                    borderRadius: BorderRadius.circular(16),
+                    child: Padding(
+                      padding: const EdgeInsets.all(6),
+                      child: Image.asset(iconPath, fit: BoxFit.contain),
+                    ),
+                  )
+                : Icon(Icons.folder_rounded,
+                    size: 32,
+                    color: AppTheme.primaryColor.withValues(alpha: 0.45)),
+          ),
+          const SizedBox(width: 14),
+          // Info
+          Expanded(
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Row(
+                  children: [
+                    Expanded(
+                      child: Text(
                         title,
-                        style:
-                            Theme.of(context).textTheme.titleMedium?.copyWith(
-                                  fontSize: 13,
-                                  fontWeight: FontWeight.w600,
-                                  height: 1.35,
-                                ),
+                        style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                              fontSize: 14,
+                              fontWeight: FontWeight.w600,
+                            ),
                         maxLines: 2,
                         overflow: TextOverflow.ellipsis,
                       ),
-                      const SizedBox(height: 6),
-                      if (tags.isNotEmpty)
-                        Wrap(
-                          spacing: 4,
-                          runSpacing: 4,
-                          children: tags.map((tag) {
-                            return Container(
-                              padding: const EdgeInsets.symmetric(
-                                horizontal: 7,
-                                vertical: 2,
-                              ),
-                              decoration: BoxDecoration(
-                                color: AppTheme.primaryColor
-                                    .withValues(alpha: 0.08),
-                                borderRadius: BorderRadius.circular(4),
-                              ),
-                              child: Text(
-                                tag,
-                                style: const TextStyle(
-                                  fontSize: 10,
-                                  color: AppTheme.primaryColor,
-                                  fontWeight: FontWeight.w500,
-                                ),
-                              ),
-                            );
-                          }).toList(),
+                    ),
+                    // Link buttons
+                    if (github != null && github.isNotEmpty)
+                      _IconLink(
+                          icon: Icons.code_rounded,
+                          url: github,
+                          tooltip: 'GitHub'),
+                    if (live != null && live.isNotEmpty) ...[
+                      const SizedBox(width: 4),
+                      _IconLink(
+                          icon: Icons.open_in_new_rounded,
+                          url: live,
+                          tooltip: 'Live demo'),
+                    ],
+                  ],
+                ),
+                const SizedBox(height: 8),
+                if (tags.isNotEmpty)
+                  Wrap(
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: tags.map((tag) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(4),
                         ),
+                        child: Text(
+                          tag,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: AppTheme.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+              ],
+            ),
+          ),
+        ],
+      ),
+    );
+  }
+
+  // Desktop: original column layout
+  Widget _buildDesktopCard(BuildContext context, String? iconPath, String title,
+      List<String> tags, String? github, String? live) {
+    return Column(
+      crossAxisAlignment: CrossAxisAlignment.stretch,
+      children: [
+        Expanded(
+          flex: 3,
+          child: ClipRRect(
+            borderRadius: const BorderRadius.only(
+              topLeft: Radius.circular(15),
+              topRight: Radius.circular(15),
+            ),
+            child: Stack(
+              fit: StackFit.expand,
+              children: [
+                Container(
+                    color: AppTheme.primaryColor.withValues(alpha: 0.06)),
+                Center(
+                  child: iconPath != null
+                      ? Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            color: Colors.white,
+                            borderRadius: BorderRadius.circular(22),
+                            boxShadow: [
+                              BoxShadow(
+                                color: Colors.black.withValues(alpha: 0.12),
+                                blurRadius: 16,
+                                offset: const Offset(0, 4),
+                              ),
+                            ],
+                          ),
+                          child: ClipRRect(
+                            borderRadius: BorderRadius.circular(22),
+                            child: Padding(
+                              padding: const EdgeInsets.all(8),
+                              child: Image.asset(iconPath,
+                                  width: 90,
+                                  height: 90,
+                                  fit: BoxFit.contain),
+                            ),
+                          ),
+                        )
+                      : Container(
+                          width: 90,
+                          height: 90,
+                          decoration: BoxDecoration(
+                            color:
+                                AppTheme.primaryColor.withValues(alpha: 0.12),
+                            borderRadius: BorderRadius.circular(22),
+                          ),
+                          child: Icon(Icons.folder_rounded,
+                              size: 48,
+                              color: AppTheme.primaryColor
+                                  .withValues(alpha: 0.45)),
+                        ),
+                ),
+                Positioned(
+                  top: 10,
+                  right: 10,
+                  child: Row(
+                    children: [
+                      if (github != null && github.isNotEmpty)
+                        _IconLink(
+                            icon: Icons.code_rounded,
+                            url: github,
+                            tooltip: 'GitHub'),
+                      if (live != null && live.isNotEmpty) ...[
+                        const SizedBox(width: 6),
+                        _IconLink(
+                            icon: Icons.open_in_new_rounded,
+                            url: live,
+                            tooltip: 'Live demo'),
+                      ],
                     ],
                   ),
                 ),
-              ),
-            ],
+              ],
+            ),
           ),
         ),
-      ),
+        Container(
+            height: 0.5,
+            color: Theme.of(context).dividerColor.withValues(alpha: 0.12)),
+        Expanded(
+          flex: 2,
+          child: Padding(
+            padding:
+                const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+            child: Column(
+              crossAxisAlignment: CrossAxisAlignment.start,
+              mainAxisAlignment: MainAxisAlignment.center,
+              children: [
+                Text(
+                  title,
+                  style: Theme.of(context).textTheme.titleMedium?.copyWith(
+                        fontSize: 13,
+                        fontWeight: FontWeight.w600,
+                        height: 1.35,
+                      ),
+                  maxLines: 2,
+                  overflow: TextOverflow.ellipsis,
+                ),
+                const SizedBox(height: 6),
+                if (tags.isNotEmpty)
+                  Wrap(
+                    spacing: 4,
+                    runSpacing: 4,
+                    children: tags.map((tag) {
+                      return Container(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 7, vertical: 2),
+                        decoration: BoxDecoration(
+                          color: AppTheme.primaryColor.withValues(alpha: 0.08),
+                          borderRadius: BorderRadius.circular(4),
+                        ),
+                        child: Text(
+                          tag,
+                          style: const TextStyle(
+                            fontSize: 10,
+                            color: AppTheme.primaryColor,
+                            fontWeight: FontWeight.w500,
+                          ),
+                        ),
+                      );
+                    }).toList(),
+                  ),
+              ],
+            ),
+          ),
+        ),
+      ],
     );
   }
 
@@ -379,7 +485,7 @@ class _ProjectCardState extends State<_ProjectCard> {
         live: live,
         images: images,
         iconPath: iconPath,
-        frameType: frameType
+        frameType: frameType,
       ),
     );
   }
@@ -426,7 +532,6 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
     super.dispose();
   }
 
-  // Opens a full-black overlay showing the icon large and centred.
   void _openIconFullscreen(BuildContext context) {
     showDialog(
       context: context,
@@ -436,32 +541,30 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
         insetPadding: EdgeInsets.zero,
         child: Stack(
           children: [
-            // Tapping the background closes the dialog
             GestureDetector(
               onTap: () => Navigator.pop(context),
               behavior: HitTestBehavior.opaque,
               child: const SizedBox.expand(),
             ),
-            // Centred icon — InteractiveViewer lets user pinch-zoom
             Center(
               child: InteractiveViewer(
                 minScale: 0.5,
                 maxScale: 4.0,
                 child: Hero(
                   tag: 'project-icon-${widget.title}',
-                  child: ClipRRect(
-                    borderRadius: BorderRadius.circular(28),
+                  child: ConstrainedBox(
+                    constraints: BoxConstraints(
+                      maxWidth: MediaQuery.of(context).size.width * 0.85,
+                      maxHeight: MediaQuery.of(context).size.height * 0.85,
+                    ),
                     child: Image.asset(
                       widget.iconPath!,
-                      width: 260,
-                      height: 260,
                       fit: BoxFit.contain,
                     ),
                   ),
                 ),
               ),
             ),
-            // Close button
             Positioned(
               top: 20,
               right: 20,
@@ -486,8 +589,15 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
 
   @override
   Widget build(BuildContext context) {
+    final isMobile = Responsive.isMobile(context);
+    final screenHeight = MediaQuery.of(context).size.height;
+
     return Dialog(
       backgroundColor: Colors.transparent,
+      insetPadding: EdgeInsets.symmetric(
+        horizontal: isMobile ? 12 : 40,
+        vertical: isMobile ? 24 : 40,
+      ),
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: Responsive.value<double>(
@@ -496,13 +606,13 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
             tablet: 600,
             desktop: 800,
           ),
-          maxHeight: MediaQuery.of(context).size.height * 0.85,
+          maxHeight: screenHeight * (isMobile ? 0.92 : 0.85),
         ),
         child: Container(
-          padding: const EdgeInsets.all(24),
+          padding: EdgeInsets.all(isMobile ? 16 : 24),
           decoration: BoxDecoration(
             color: Theme.of(context).colorScheme.surface,
-            borderRadius: BorderRadius.circular(20),
+            borderRadius: BorderRadius.circular(isMobile ? 16 : 20),
             boxShadow: [
               BoxShadow(
                 color: Colors.black.withValues(alpha: 0.2),
@@ -515,11 +625,11 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Header ───────────────────────────────────
+              // ── Header ──────────────────────────────────
               Row(
+                crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
                   if (widget.iconPath != null)
-                    // Tappable icon — opens fullscreen viewer
                     Tooltip(
                       message: 'View full size',
                       child: GestureDetector(
@@ -529,26 +639,27 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                           child: Hero(
                             tag: 'project-icon-${widget.title}',
                             child: Container(
-                              width: 44,
-                              height: 44,
-                              margin: const EdgeInsets.only(right: 12),
+                              width: 40,
+                              height: 40,
+                              margin: const EdgeInsets.only(right: 10),
                               decoration: BoxDecoration(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 boxShadow: [
                                   BoxShadow(
-                                    color: Colors.black.withValues(alpha: 0.10),
+                                    color:
+                                        Colors.black.withValues(alpha: 0.10),
                                     blurRadius: 8,
                                     offset: const Offset(0, 2),
                                   ),
                                 ],
                               ),
                               child: ClipRRect(
-                                borderRadius: BorderRadius.circular(12),
+                                borderRadius: BorderRadius.circular(10),
                                 child: Image.asset(
                                   widget.iconPath!,
-                                  width: 44,
-                                  height: 44,
-                                  fit: BoxFit.cover,
+                                  width: 40,
+                                  height: 40,
+                                  fit: BoxFit.contain,
                                 ),
                               ),
                             ),
@@ -561,17 +672,23 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                       widget.title,
                       style: Theme.of(context)
                           .textTheme
-                          .headlineMedium
-                          ?.copyWith(fontSize: 22),
+                          .titleLarge
+                          ?.copyWith(
+                            fontSize: isMobile ? 15 : 20,
+                            fontWeight: FontWeight.w700,
+                          ),
                     ),
                   ),
                   IconButton(
-                    icon: const Icon(Icons.close),
+                    padding: EdgeInsets.zero,
+                    constraints: const BoxConstraints(),
+                    icon: const Icon(Icons.close, size: 20),
                     onPressed: () => Navigator.pop(context),
                   ),
                 ],
               ),
-              const SizedBox(height: 16),
+
+              const SizedBox(height: 12),
 
               // ── Scrollable body ──────────────────────────
               Flexible(
@@ -580,62 +697,62 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                   thumbVisibility: true,
                   child: SingleChildScrollView(
                     controller: _scrollController,
-                    padding: const EdgeInsets.only(right: 8),
+                    padding: const EdgeInsets.only(right: 4),
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
                         Text(
                           widget.description,
-                          style: Theme.of(context).textTheme.bodyMedium,
+                          style: Theme.of(context)
+                              .textTheme
+                              .bodyMedium
+                              ?.copyWith(fontSize: isMobile ? 13 : 14),
                         ),
-                        const SizedBox(height: 16),
+                        const SizedBox(height: 12),
                         if (widget.tags.isNotEmpty)
                           Wrap(
-                            spacing: 8,
+                            spacing: 6,
                             runSpacing: 6,
                             children: widget.tags
-                                .map(
-                                  (tag) => Container(
-                                    padding: const EdgeInsets.symmetric(
-                                      horizontal: 10,
-                                      vertical: 4,
-                                    ),
-                                    decoration: BoxDecoration(
-                                      color: AppTheme.primaryColor
-                                          .withValues(alpha: 0.08),
-                                      borderRadius: BorderRadius.circular(6),
-                                    ),
-                                    child: Text(
-                                      tag,
-                                      style: const TextStyle(
-                                        fontSize: 12,
-                                        color: AppTheme.primaryColor,
-                                        fontWeight: FontWeight.w500,
+                                .map((tag) => Container(
+                                      padding: const EdgeInsets.symmetric(
+                                          horizontal: 10, vertical: 4),
+                                      decoration: BoxDecoration(
+                                        color: AppTheme.primaryColor
+                                            .withValues(alpha: 0.08),
+                                        borderRadius:
+                                            BorderRadius.circular(6),
                                       ),
-                                    ),
-                                  ),
-                                )
+                                      child: Text(
+                                        tag,
+                                        style: const TextStyle(
+                                          fontSize: 11,
+                                          color: AppTheme.primaryColor,
+                                          fontWeight: FontWeight.w500,
+                                        ),
+                                      ),
+                                    ))
                                 .toList(),
                           ),
                         if (widget.images.isNotEmpty) ...[
-                          const SizedBox(height: 24),
-                          Text(
-                            'Screenshots',
-                            style: Theme.of(context).textTheme.titleMedium,
-                          ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 20),
+                          Text('Screenshots',
+                              style: Theme.of(context)
+                                  .textTheme
+                                  .titleMedium
+                                  ?.copyWith(fontSize: isMobile ? 13 : 15)),
+                          const SizedBox(height: 10),
                           Center(
                             child: ImageCarousel(images: widget.images),
                           ),
-                          const SizedBox(height: 12),
+                          const SizedBox(height: 8),
                           Center(
                             child: TextButton.icon(
                               onPressed: () => _openFullscreen(context),
-                              icon: const Icon(
-                                Icons.fullscreen_rounded,
-                                size: 18,
-                              ),
-                              label: const Text('View Fullscreen'),
+                              icon: const Icon(Icons.fullscreen_rounded,
+                                  size: 16),
+                              label: const Text('View Fullscreen',
+                                  style: TextStyle(fontSize: 12)),
                             ),
                           ),
                         ],
@@ -646,7 +763,7 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                 ),
               ),
 
-              const SizedBox(height: 16),
+              const SizedBox(height: 12),
 
               // ── Action buttons ───────────────────────────
               Row(
@@ -654,15 +771,25 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                   if (widget.github != null && widget.github!.isNotEmpty)
                     ElevatedButton.icon(
                       onPressed: () => _launch(widget.github!),
-                      icon: const Icon(Icons.code),
+                      icon: const Icon(Icons.code, size: 16),
                       label: const Text('GitHub'),
+                      style: ElevatedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        textStyle: const TextStyle(fontSize: 13),
+                      ),
                     ),
                   if (widget.live != null && widget.live!.isNotEmpty) ...[
-                    const SizedBox(width: 12),
+                    const SizedBox(width: 10),
                     OutlinedButton.icon(
                       onPressed: () => _launch(widget.live!),
-                      icon: const Icon(Icons.open_in_new),
+                      icon: const Icon(Icons.open_in_new, size: 16),
                       label: const Text('Live'),
+                      style: OutlinedButton.styleFrom(
+                        padding: const EdgeInsets.symmetric(
+                            horizontal: 14, vertical: 10),
+                        textStyle: const TextStyle(fontSize: 13),
+                      ),
                     ),
                   ],
                 ],
@@ -708,7 +835,7 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
   }
 }
 
-// ── Icon link button (overlaid on card icon zone) ──────────
+// ── Icon link button ───────────────────────────────────────
 class _IconLink extends StatefulWidget {
   final IconData icon;
   final String url;

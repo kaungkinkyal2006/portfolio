@@ -7,7 +7,6 @@ import 'package:porfolio/app/view/section/skills_section.dart';
 import 'package:porfolio/app/view/widget/navbar/app_navbar.dart';
 import 'package:porfolio/app/view/widget/navbar/mobile_drawer.dart';
 import '../../controllers/navigation_controller.dart';
-import '../../utils/responsive.dart';
 
 class HomeView extends StatelessWidget {
   const HomeView({super.key});
@@ -22,18 +21,32 @@ class HomeView extends StatelessWidget {
           // ── Sticky navbar ────────────────────────────
           AppNavbar(),
 
+          // ── Mobile drawer dropdown ───────────────────
+          Obx(() => AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            transitionBuilder: (child, animation) => SizeTransition(
+              sizeFactor: animation,
+              axisAlignment: -1,
+              child: child,
+            ),
+            child: nav.isMenuOpen.value
+                ? KeyedSubtree(
+                    key: const ValueKey('drawer'),
+                    child: const MobileDrawer(),
+                  )
+                : const SizedBox.shrink(),
+          )),
+
           // ── Scrollable content ───────────────────────
           Expanded(
             child: SingleChildScrollView(
               controller: nav.scrollController,
               child: Column(
                 children: [
-                 HeroSection(key: nav.sectionKeys[0]),
-                 
-                 SkillsSection(key: nav.sectionKeys[1]),
-                 ProjectsSection(key: nav.sectionKeys[2]),
-
-                 ContactSection(key: nav.sectionKeys[3]),
+                  HeroSection(key: nav.sectionKeys[0]),
+                  SkillsSection(key: nav.sectionKeys[1]),
+                  ProjectsSection(key: nav.sectionKeys[2]),
+                  ContactSection(key: nav.sectionKeys[3]),
                 ],
               ),
             ),
@@ -42,29 +55,4 @@ class HomeView extends StatelessWidget {
       ),
     );
   }
-
-  // Widget _buildSection({
-  //   required GlobalKey key,
-  //   required String label,
-  //   required BuildContext context,
-  //   required Color color,
-  // }) {
-  //   final hPadding = Responsive.value<double>(
-  //     context,
-  //     mobile: 24,
-  //     tablet: 60,
-  //     desktop: 120,
-  //   );
-
-  //   return Container(
-  //     key: key,
-  //     width: double.infinity,
-  //     height: 500,
-  //     color: color,
-  //     padding: EdgeInsets.symmetric(horizontal: hPadding),
-  //     child: Center(
-  //       child: Text(label, style: Theme.of(context).textTheme.displayMedium),
-  //     ),
-  //   );
-  // }
 }
