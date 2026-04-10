@@ -79,6 +79,11 @@ flutter:
     - assets/send_food.png
     - assets/screenshots/send_food_mobile_home_start.png
     - assets/screenshots/send_food_mobile_shop_view.png
+    - assets/screenshots/send_food_mobile_item_view.png
+    - assets/screenshots/send_food_mobile_checkout_view.png
+    - assets/screenshots/send_food_mobile_complete_view.png
+    - assets/screenshots/junction_tower_dashboard_view.png
+    - assets/junction_tower.png
   # An image asset can refer to one or more resolution-specific "variants", see
   # https://flutter.dev/to/resolution-aware-images
 

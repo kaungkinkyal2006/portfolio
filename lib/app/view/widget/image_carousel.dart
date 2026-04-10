@@ -42,24 +42,42 @@ class _ImageCarouselState extends State<ImageCarousel> {
   // frame was 350px tall + arrows + dots + padding = overflow → arrows
   // painted outside bounds → taps ignored by the hit-test system.
   Widget _buildFrame(String img) {
-    final isMobile = img.contains('mobile');
+  final isMobile = img.contains('mobile');
 
-    if (isMobile) {
-      return SizedBox(
-        width: widget.isFullScreen ? 280 : 160,
-        height: widget.isFullScreen ? 560 : 360,
-        child: IphoneFrameWidget(screenshotPath: img),
-      );
-    }
-
+  if (isMobile) {
     return SizedBox(
-      width: widget.isFullScreen ? 860 : 480,
-      height: widget.isFullScreen ? 540 : 300,
+      width: widget.isFullScreen ? 280 : 160,
+      height: widget.isFullScreen ? 560 : 360,
+      child: IphoneFrameWidget(screenshotPath: img),
+    );
+  }
+
+  // Desktop — fullscreen uses almost full screen size
+  if (widget.isFullScreen) {
+    final size = MediaQuery.of(context).size;
+    return SizedBox(
+      width: size.width * 0.88,
+      height: size.height * 0.80,
       child: WindowFrame(
-        child: Image.asset(img, fit: BoxFit.cover),
+        child: Image.asset(img, fit: BoxFit.cover,
+          width: double.infinity,
+          height: double.infinity,
+        ),
       ),
     );
   }
+
+  return SizedBox(
+    width: 480,
+    height: 300,
+    child: WindowFrame(
+      child: Image.asset(img, fit: BoxFit.cover,
+        width: double.infinity,
+        height: double.infinity,
+      ),
+    ),
+  );
+}
 
   @override
   Widget build(BuildContext context) {

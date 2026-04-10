@@ -79,7 +79,6 @@ class _TagFilter extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    // FIX: withOpacity deprecated → withValues(alpha:)
     return Obx(() => Wrap(
           spacing: 10,
           runSpacing: 10,
@@ -141,19 +140,17 @@ class _ProjectsGrid extends StatelessWidget {
         physics: const NeverScrollableScrollPhysics(),
         gridDelegate: SliverGridDelegateWithFixedCrossAxisCount(
           crossAxisCount: crossCount,
-          crossAxisSpacing: 24,
-          mainAxisSpacing: 24,
+          crossAxisSpacing: 16,
+          mainAxisSpacing: 16,
           childAspectRatio: Responsive.value<double>(
             context,
-            mobile: 1.4,
-            tablet: 1.2,
-            desktop: 1.1,
+            mobile: 2.4,
+            tablet: 0.88,
+            desktop: 0.92,
           ),
         ),
         itemCount: filtered.length,
-        itemBuilder: (_, index) => _ProjectCard(
-          project: filtered[index],
-        ),
+        itemBuilder: (_, index) => _ProjectCard(project: filtered[index]),
       );
     });
   }
@@ -179,7 +176,6 @@ class _ProjectCardState extends State<_ProjectCard> {
     final github = widget.project['github'] as String?;
     final live = widget.project['live'] as String?;
 
-    // FIX: withOpacity deprecated → withValues(alpha:) throughout
     return MouseRegion(
       cursor: SystemMouseCursors.click,
       onEnter: (_) => setState(() => _hovered = true),
@@ -200,96 +196,163 @@ class _ProjectCardState extends State<_ProjectCard> {
             boxShadow: [
               BoxShadow(
                 color: _hovered
-                    ? AppTheme.primaryColor.withValues(alpha: 0.12)
-                    : Colors.black.withValues(alpha: 0.05),
-                blurRadius: _hovered ? 24 : 10,
-                offset: const Offset(0, 8),
+                    ? AppTheme.primaryColor.withValues(alpha: 0.10)
+                    : Colors.black.withValues(alpha: 0.04),
+                blurRadius: _hovered ? 24 : 8,
+                offset: const Offset(0, 6),
               ),
             ],
           ),
-          padding: const EdgeInsets.all(16),
           child: Column(
-            crossAxisAlignment: CrossAxisAlignment.start,
-            mainAxisSize: MainAxisSize.min,
+            crossAxisAlignment: CrossAxisAlignment.stretch,
             children: [
-              Row(
-                crossAxisAlignment: CrossAxisAlignment.start,
-                children: [
-                  Container(
-                    width: 40,
-                    height: 40,
-                    decoration: BoxDecoration(
-                      color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                      borderRadius: BorderRadius.circular(10),
-                    ),
-                    child: iconPath != null
-                        ? ClipRRect(
-                            borderRadius: BorderRadius.circular(10),
-                            child: Image.asset(iconPath, fit: BoxFit.cover),
-                          )
-                        : const Icon(
-                            Icons.folder_rounded,
-                            color: AppTheme.primaryColor,
-                            size: 24,
-                          ),
+              // ── Icon zone ────────────────────────────────
+              Expanded(
+                flex: 3,
+                child: ClipRRect(
+                  borderRadius: const BorderRadius.only(
+                    topLeft: Radius.circular(15),
+                    topRight: Radius.circular(15),
                   ),
-                  const SizedBox(width: 12),
-                  Expanded(
-                    child: Text(
-                      title,
-                      style: Theme.of(context).textTheme.titleMedium?.copyWith(
-                            fontSize: 16,
-                            fontWeight: FontWeight.w600,
-                          ),
-                      maxLines: 2,
-                      overflow: TextOverflow.ellipsis,
-                    ),
-                  ),
-                  const SizedBox(width: 8),
-                  Row(
+                  child: Stack(
+                    fit: StackFit.expand,
                     children: [
-                      if (github != null && github.isNotEmpty)
-                        _IconLink(
-                          icon: Icons.code_rounded,
-                          url: github,
-                          tooltip: 'GitHub',
+                      Container(
+                        color: AppTheme.primaryColor.withValues(alpha: 0.06),
+                      ),
+                      Center(
+                        child: iconPath != null
+                            ? Container(
+                                width: 90,
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  color:Colors.white,
+                                  borderRadius: BorderRadius.circular(22),
+                                  boxShadow: [
+                                    BoxShadow(
+                                      color:
+                                          Colors.black.withValues(alpha: 0.12),
+                                      blurRadius: 16,
+                                      offset: const Offset(0, 4),
+                                    ),
+                                  ],
+                                ),
+                                child: ClipRRect(
+                                  borderRadius: BorderRadius.circular(22),
+                                  child: Padding(
+                                    padding: const EdgeInsets.all(8.0),
+                                    child: Image.asset(
+                                      iconPath,
+                                      width: 90,
+                                      height: 90,
+                                      fit: BoxFit.contain,
+                                    ),
+                                  ),
+                                ),
+                              )
+                            : Container(
+                                width: 90,
+                                height: 90,
+                                decoration: BoxDecoration(
+                                  color: AppTheme.primaryColor
+                                      .withValues(alpha: 0.12),
+                                  borderRadius: BorderRadius.circular(22),
+                                ),
+                                child: Icon(
+                                  Icons.folder_rounded,
+                                  size: 48,
+                                  color: AppTheme.primaryColor
+                                      .withValues(alpha: 0.45),
+                                ),
+                              ),
+                      ),
+                      // Link buttons
+                      Positioned(
+                        top: 10,
+                        right: 10,
+                        child: Row(
+                          children: [
+                            if (github != null && github.isNotEmpty)
+                              _IconLink(
+                                icon: Icons.code_rounded,
+                                url: github,
+                                tooltip: 'GitHub',
+                              ),
+                            if (live != null && live.isNotEmpty) ...[
+                              const SizedBox(width: 6),
+                              _IconLink(
+                                icon: Icons.open_in_new_rounded,
+                                url: live,
+                                tooltip: 'Live demo',
+                              ),
+                            ],
+                          ],
                         ),
-                      if (live != null && live.isNotEmpty) ...[
-                        const SizedBox(width: 6),
-                        _IconLink(
-                          icon: Icons.open_in_new_rounded,
-                          url: live,
-                          tooltip: 'Live demo',
-                        ),
-                      ],
+                      ),
                     ],
                   ),
-                ],
-              ),
-              const SizedBox(height: 12),
-              if (tags.isNotEmpty)
-                Wrap(
-                  spacing: 6,
-                  runSpacing: 4,
-                  children: tags.map((tag) {
-                    return Container(
-                      padding: const EdgeInsets.symmetric(
-                          horizontal: 8, vertical: 4),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.08),
-                        borderRadius: BorderRadius.circular(6),
-                      ),
-                      child: Text(
-                        tag,
-                        style: const TextStyle(
-                          fontSize: 11,
-                          color: AppTheme.primaryColor,
-                          fontWeight: FontWeight.w500,
-                        ),
-                      ),
-                    );
-                  }).toList(),
                 ),
+              ),
+
+              Container(
+                height: 0.5,
+                color: Theme.of(context).dividerColor.withValues(alpha: 0.12),
+              ),
+
+              // ── Info zone ────────────────────────────────
+              Expanded(
+                flex: 2,
+                child: Padding(
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 14,
+                    vertical: 10,
+                  ),
+                  child: Column(
+                    crossAxisAlignment: CrossAxisAlignment.start,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        title,
+                        style:
+                            Theme.of(context).textTheme.titleMedium?.copyWith(
+                                  fontSize: 13,
+                                  fontWeight: FontWeight.w600,
+                                  height: 1.35,
+                                ),
+                        maxLines: 2,
+                        overflow: TextOverflow.ellipsis,
+                      ),
+                      const SizedBox(height: 6),
+                      if (tags.isNotEmpty)
+                        Wrap(
+                          spacing: 4,
+                          runSpacing: 4,
+                          children: tags.map((tag) {
+                            return Container(
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 7,
+                                vertical: 2,
+                              ),
+                              decoration: BoxDecoration(
+                                color: AppTheme.primaryColor
+                                    .withValues(alpha: 0.08),
+                                borderRadius: BorderRadius.circular(4),
+                              ),
+                              child: Text(
+                                tag,
+                                style: const TextStyle(
+                                  fontSize: 10,
+                                  color: AppTheme.primaryColor,
+                                  fontWeight: FontWeight.w500,
+                                ),
+                              ),
+                            );
+                          }).toList(),
+                        ),
+                    ],
+                  ),
+                ),
+              ),
             ],
           ),
         ),
@@ -304,6 +367,7 @@ class _ProjectCardState extends State<_ProjectCard> {
     final github = widget.project['github'] as String?;
     final live = widget.project['live'] as String?;
     final images = (widget.project['images'] as List<String>?) ?? [];
+    final frameType = widget.project['frameType'] as String? ?? 'mobile';
 
     showDialog(
       context: context,
@@ -315,16 +379,13 @@ class _ProjectCardState extends State<_ProjectCard> {
         live: live,
         images: images,
         iconPath: iconPath,
+        frameType: frameType
       ),
     );
   }
 }
 
-// ── Detail dialog — extracted to its own StatefulWidget ───
-// FIX: The Scrollbar crash is caused by passing a fresh ScrollController()
-// inline (which is never disposed) and the Scrollbar trying to paint before
-// the controller has a position attached. Fix: own the controller in
-// StatefulWidget so it is created once, properly attached, and disposed.
+// ── Detail dialog ──────────────────────────────────────────
 class _ProjectDetailDialog extends StatefulWidget {
   final String title;
   final String description;
@@ -333,6 +394,7 @@ class _ProjectDetailDialog extends StatefulWidget {
   final String? live;
   final List<String> images;
   final String? iconPath;
+  final String frameType;
 
   const _ProjectDetailDialog({
     required this.title,
@@ -342,6 +404,7 @@ class _ProjectDetailDialog extends StatefulWidget {
     required this.live,
     required this.images,
     this.iconPath,
+    this.frameType = 'mobile',
   });
 
   @override
@@ -349,10 +412,6 @@ class _ProjectDetailDialog extends StatefulWidget {
 }
 
 class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
-  // FIX: Controller lives here — created once, disposed properly.
-  // This is the root cause of "Scrollbar's ScrollController has no
-  // ScrollPosition attached." — an inline ScrollController() is constructed
-  // fresh every build and never has time to attach before Scrollbar paints.
   late final ScrollController _scrollController;
 
   @override
@@ -367,12 +426,68 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
     super.dispose();
   }
 
+  // Opens a full-black overlay showing the icon large and centred.
+  void _openIconFullscreen(BuildContext context) {
+    showDialog(
+      context: context,
+      barrierColor: Colors.black.withValues(alpha: 0.92),
+      builder: (_) => Dialog(
+        backgroundColor: Colors.transparent,
+        insetPadding: EdgeInsets.zero,
+        child: Stack(
+          children: [
+            // Tapping the background closes the dialog
+            GestureDetector(
+              onTap: () => Navigator.pop(context),
+              behavior: HitTestBehavior.opaque,
+              child: const SizedBox.expand(),
+            ),
+            // Centred icon — InteractiveViewer lets user pinch-zoom
+            Center(
+              child: InteractiveViewer(
+                minScale: 0.5,
+                maxScale: 4.0,
+                child: Hero(
+                  tag: 'project-icon-${widget.title}',
+                  child: ClipRRect(
+                    borderRadius: BorderRadius.circular(28),
+                    child: Image.asset(
+                      widget.iconPath!,
+                      width: 260,
+                      height: 260,
+                      fit: BoxFit.contain,
+                    ),
+                  ),
+                ),
+              ),
+            ),
+            // Close button
+            Positioned(
+              top: 20,
+              right: 20,
+              child: Material(
+                color: Colors.white.withValues(alpha: 0.15),
+                borderRadius: BorderRadius.circular(20),
+                child: InkWell(
+                  borderRadius: BorderRadius.circular(20),
+                  onTap: () => Navigator.pop(context),
+                  child: const Padding(
+                    padding: EdgeInsets.all(8),
+                    child: Icon(Icons.close, color: Colors.white, size: 20),
+                  ),
+                ),
+              ),
+            ),
+          ],
+        ),
+      ),
+    );
+  }
+
   @override
   Widget build(BuildContext context) {
     return Dialog(
       backgroundColor: Colors.transparent,
-      // FIX: Use constraints on the Dialog itself so it respects safe
-      // areas and doesn't overflow on small screens / mobile web.
       child: ConstrainedBox(
         constraints: BoxConstraints(
           maxWidth: Responsive.value<double>(
@@ -381,8 +496,6 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
             tablet: 600,
             desktop: 800,
           ),
-          // FIX: maxHeight as fraction of screen so dialog never overflows
-          // on short viewports (e.g. landscape mobile, small browser window).
           maxHeight: MediaQuery.of(context).size.height * 0.85,
         ),
         child: Container(
@@ -402,21 +515,45 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
             crossAxisAlignment: CrossAxisAlignment.start,
             mainAxisSize: MainAxisSize.min,
             children: [
-              // ── Header row ───────────────────────────────
+              // ── Header ───────────────────────────────────
               Row(
                 children: [
                   if (widget.iconPath != null)
-                    Container(
-                      width: 40,
-                      height: 40,
-                      margin: const EdgeInsets.only(right: 12),
-                      decoration: BoxDecoration(
-                        color: AppTheme.primaryColor.withValues(alpha: 0.1),
-                        borderRadius: BorderRadius.circular(10),
-                      ),
-                      child: ClipRRect(
-                        borderRadius: BorderRadius.circular(10),
-                        child: Image.asset(widget.iconPath!, fit: BoxFit.cover),
+                    // Tappable icon — opens fullscreen viewer
+                    Tooltip(
+                      message: 'View full size',
+                      child: GestureDetector(
+                        onTap: () => _openIconFullscreen(context),
+                        child: MouseRegion(
+                          cursor: SystemMouseCursors.click,
+                          child: Hero(
+                            tag: 'project-icon-${widget.title}',
+                            child: Container(
+                              width: 44,
+                              height: 44,
+                              margin: const EdgeInsets.only(right: 12),
+                              decoration: BoxDecoration(
+                                borderRadius: BorderRadius.circular(12),
+                                boxShadow: [
+                                  BoxShadow(
+                                    color: Colors.black.withValues(alpha: 0.10),
+                                    blurRadius: 8,
+                                    offset: const Offset(0, 2),
+                                  ),
+                                ],
+                              ),
+                              child: ClipRRect(
+                                borderRadius: BorderRadius.circular(12),
+                                child: Image.asset(
+                                  widget.iconPath!,
+                                  width: 44,
+                                  height: 44,
+                                  fit: BoxFit.cover,
+                                ),
+                              ),
+                            ),
+                          ),
+                        ),
                       ),
                     ),
                   Expanded(
@@ -437,9 +574,6 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
               const SizedBox(height: 16),
 
               // ── Scrollable body ──────────────────────────
-              // FIX: Pass the same _scrollController to BOTH Scrollbar
-              // and SingleChildScrollView. This is what binds them together
-              // and eliminates the "no ScrollPosition attached" crash.
               Flexible(
                 child: Scrollbar(
                   controller: _scrollController,
@@ -450,14 +584,11 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                     child: Column(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Description
                         Text(
                           widget.description,
                           style: Theme.of(context).textTheme.bodyMedium,
                         ),
                         const SizedBox(height: 16),
-
-                        // Tags
                         if (widget.tags.isNotEmpty)
                           Wrap(
                             spacing: 8,
@@ -466,7 +597,9 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                                 .map(
                                   (tag) => Container(
                                     padding: const EdgeInsets.symmetric(
-                                        horizontal: 10, vertical: 4),
+                                      horizontal: 10,
+                                      vertical: 4,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: AppTheme.primaryColor
                                           .withValues(alpha: 0.08),
@@ -484,11 +617,6 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                                 )
                                 .toList(),
                           ),
-
-                        // Screenshots section
-                        // FIX: The original had broken if/else indentation —
-                        // "Screenshots" text and ImageCarousel were ALWAYS
-                        // shown even when images was empty. Wrapped correctly.
                         if (widget.images.isNotEmpty) ...[
                           const SizedBox(height: 24),
                           Text(
@@ -503,13 +631,14 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
                           Center(
                             child: TextButton.icon(
                               onPressed: () => _openFullscreen(context),
-                              icon: const Icon(Icons.fullscreen_rounded,
-                                  size: 18),
+                              icon: const Icon(
+                                Icons.fullscreen_rounded,
+                                size: 18,
+                              ),
                               label: const Text('View Fullscreen'),
                             ),
                           ),
                         ],
-
                         const SizedBox(height: 8),
                       ],
                     ),
@@ -579,7 +708,7 @@ class _ProjectDetailDialogState extends State<_ProjectDetailDialog> {
   }
 }
 
-// ── Icon link button ───────────────────────────────────────
+// ── Icon link button (overlaid on card icon zone) ──────────
 class _IconLink extends StatefulWidget {
   final IconData icon;
   final String url;
@@ -613,20 +742,32 @@ class _IconLinkState extends State<_IconLink> {
           },
           child: AnimatedContainer(
             duration: const Duration(milliseconds: 150),
-            width: 36,
-            height: 36,
+            width: 30,
+            height: 30,
             decoration: BoxDecoration(
               color: _hovered
-                  ? AppTheme.primaryColor.withValues(alpha: 0.1)
-                  : Colors.transparent,
+                  ? Theme.of(context).colorScheme.surface
+                  : Theme.of(context)
+                      .colorScheme
+                      .surface
+                      .withValues(alpha: 0.80),
               borderRadius: BorderRadius.circular(8),
+              border: Border.all(
+                color:
+                    Theme.of(context).dividerColor.withValues(alpha: 0.15),
+                width: 0.5,
+              ),
             ),
             child: Icon(
               widget.icon,
-              size: 20,
+              size: 15,
               color: _hovered
                   ? AppTheme.primaryColor
-                  : Theme.of(context).textTheme.bodyMedium?.color,
+                  : Theme.of(context)
+                      .textTheme
+                      .bodyMedium
+                      ?.color
+                      ?.withValues(alpha: 0.6),
             ),
           ),
         ),

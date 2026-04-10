@@ -43,14 +43,24 @@ class PortfolioData {
       'icon': 'assets/send_food.png',
       'images': [
       'assets/screenshots/send_food_mobile_home_start.png',
-      'assets/screenshots/send_food_mobile_shop_view.png',    ],
+      'assets/screenshots/send_food_mobile_shop_view.png', 
+      'assets/screenshots/send_food_mobile_item_view.png', 
+      'assets/screenshots/send_food_mobile_checkout_view.png', 
+      'assets/screenshots/send_food_mobile_complete_view.png', 
+
+         ],
     },
     {
-      'title':       'Weather App',
-      'description': 'Real-time weather with beautiful animations and location support.',
-      'tags':        ['Flutter', 'REST API', 'GetX'],
-      'github':      'https://github.com/yourhandle/project2',
-      'live':        '',
+      'title':       'Junction Tower – POS Synchronisation System',
+      'description': "A desktop application built with Flutter that streamlines sales order management for Junction Tower. The system allows staff to import sales order data directly from Excel files, intelligently parses and extracts the relevant records, and synchronises them to the central server — eliminating manual data entry and reducing human error.Designed to bridge the gap between point-of-sale terminals and the backend server, the app handles credential-based authentication to ensure only authorised devices can push data. Built with Flutter's default state management for a lightweight and responsive desktop experience.",
+      'tags':        ['Flutter', 'REST API', 'setState'],
+      // 'github':      'https://github.com/yourhandle/project2',
+      // 'live':        '',
+      'frameType': 'desktop',
+      // 'icon': 'assets/junction_tower.png',
+      'images': [
+        'assets/screenshots/junction_tower_dashboard_view.png',
+      ],
     },
     {
       'title':       'Portfolio Website',
